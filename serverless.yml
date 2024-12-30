@@ -1,0 +1,53 @@
+service: serverless-s3-functions
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  apiGateway:
+    binaryMediaTypes:
+      - "*/*"
+  environment:
+    NODE_ENV: dev
+    BUCKET_NAME: serverless-s3-functions-bucket # Set your existing bucket name here
+    DYNAMODB_TABLE_NAME: serverless-s3-functions-face-dynamodb-table
+    REKOG_COLLECTION_NAME: face-recognition-collection
+ 
+functions:
+  app:
+    handler: app.appHandler
+    events:
+      - http:
+          path: /test
+          method: get
+      - http:
+          path: /upload
+          method: post
+      - http:
+          path: /searchfaces
+          method: post
+      - http:
+          path: /delete/{fileName}
+          method: delete
+      - http:
+          path: /view/{fileName}
+          method: get
+      - http:
+          path: /files
+          method: get
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+custom:
+  serverless-offline:
+    httpPort: 4000
+
+resources:
+  Resources:
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: serverless-s3-functions-bucket # Reference your existing bucket here
+    
